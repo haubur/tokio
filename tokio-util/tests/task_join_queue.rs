@@ -337,7 +337,7 @@ async fn test_join_queue_try_join_next_with_id_does_not_replace_waker() {
 async fn test_join_queue_try_join_next_disabled_coop() {
     // This number is large enough to trigger coop. Without using `tokio::task::coop::unconstrained`
     // inside `try_join_next` this test fails on `assert!(coop_count == 0)`.
-    const TASK_NUM: u32 = 1000;
+    const TASK_NUM: usize = 1000;
 
     let sem: std::sync::Arc<tokio::sync::Semaphore> =
         std::sync::Arc::new(tokio::sync::Semaphore::new(0));

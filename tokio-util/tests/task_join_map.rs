@@ -3,7 +3,7 @@
 
 use std::panic::AssertUnwindSafe;
 
-use futures::future::{pending, FutureExt};
+use futures::future::{FutureExt, pending};
 use tokio::sync::oneshot;
 use tokio::task::LocalSet;
 use tokio::time::Duration;
@@ -284,7 +284,7 @@ fn runtime_gone() {
 #[tokio::test(flavor = "current_thread")]
 async fn join_map_coop() {
     // Large enough to trigger coop.
-    const TASK_NUM: u32 = 1000;
+    const TASK_NUM: usize = 1000;
 
     static SEM: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(0);
 
@@ -419,7 +419,7 @@ async fn try_join_next_aborted_task() {
 
 #[tokio::test(flavor = "current_thread")]
 async fn try_join_next_advances_through_multiple() {
-    const N: u32 = 8;
+    const N: usize = 8;
 
     static SEM: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(0);
 

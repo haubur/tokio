@@ -658,10 +658,10 @@ impl Semaphore {
     ///
     /// [`AcquireError`]: crate::sync::AcquireError
     /// [`SemaphorePermit`]: crate::sync::SemaphorePermit
-    pub async fn acquire_many(&self, n: u32) -> Result<SemaphorePermit<'_>, AcquireError> {
+    pub async fn acquire_many(&self, n: usize) -> Result<SemaphorePermit<'_>, AcquireError> {
         #[cfg(all(tokio_unstable, feature = "tracing"))]
         trace::async_op(
-            || self.ll_sem.acquire(n as usize),
+            || self.ll_sem.acquire(n),
             self.resource_span.clone(),
             "Semaphore::acquire_many",
             "poll",
@@ -670,7 +670,7 @@ impl Semaphore {
         .await?;
 
         #[cfg(not(all(tokio_unstable, feature = "tracing")))]
-        self.ll_sem.acquire(n as usize).await?;
+        self.ll_sem.acquire(n).await?;
 
         Ok(SemaphorePermit {
             sem: self,
@@ -741,8 +741,8 @@ impl Semaphore {
     /// [`TryAcquireError::Closed`]: crate::sync::TryAcquireError::Closed
     /// [`TryAcquireError::NoPermits`]: crate::sync::TryAcquireError::NoPermits
     /// [`SemaphorePermit`]: crate::sync::SemaphorePermit
-    pub fn try_acquire_many(&self, n: u32) -> Result<SemaphorePermit<'_>, TryAcquireError> {
-        match self.ll_sem.try_acquire(n as usize) {
+    pub fn try_acquire_many(&self, n: usize) -> Result<SemaphorePermit<'_>, TryAcquireError> {
+        match self.ll_sem.try_acquire(n) {
             Ok(()) => Ok(SemaphorePermit {
                 sem: self,
                 permits: n as usize,
@@ -835,7 +835,7 @@ impl Semaphore {
     /// [`acquire_many`]: Semaphore::acquire_many
     #[track_caller]
     #[cfg(feature = "sync")]
-    pub fn blocking_acquire_many(&self, n: u32) -> Result<SemaphorePermit<'_>, AcquireError> {
+    pub fn blocking_acquire_many(&self, n: usize) -> Result<SemaphorePermit<'_>, AcquireError> {
         crate::future::block_on(self.acquire_many(n))
     }
 
@@ -944,18 +944,18 @@ impl Semaphore {
     /// [`OwnedSemaphorePermit`]: crate::sync::OwnedSemaphorePermit
     pub async fn acquire_many_owned(
         self: Arc<Self>,
-        n: u32,
+        n: usize,
     ) -> Result<OwnedSemaphorePermit, AcquireError> {
         #[cfg(all(tokio_unstable, feature = "tracing"))]
         let inner = trace::async_op(
-            || self.ll_sem.acquire(n as usize),
+            || self.ll_sem.acquire(n),
             self.resource_span.clone(),
             "Semaphore::acquire_many_owned",
             "poll",
             true,
         );
         #[cfg(not(all(tokio_unstable, feature = "tracing")))]
-        let inner = self.ll_sem.acquire(n as usize);
+        let inner = self.ll_sem.acquire(n);
 
         inner.await?;
         Ok(OwnedSemaphorePermit {
@@ -1037,9 +1037,9 @@ impl Semaphore {
     /// [`OwnedSemaphorePermit`]: crate::sync::OwnedSemaphorePermit
     pub fn try_acquire_many_owned(
         self: Arc<Self>,
-        n: u32,
+        n: usize,
     ) -> Result<OwnedSemaphorePermit, TryAcquireError> {
-        match self.ll_sem.try_acquire(n as usize) {
+        match self.ll_sem.try_acquire(n) {
             Ok(()) => Ok(OwnedSemaphorePermit {
                 sem: self,
                 permits: n as usize,
@@ -1124,7 +1124,7 @@ impl Semaphore {
     #[cfg(feature = "sync")]
     pub fn blocking_acquire_many_owned(
         self: Arc<Self>,
-        n: u32,
+        n: usize,
     ) -> Result<OwnedSemaphorePermit, AcquireError> {
         crate::future::block_on(self.acquire_many_owned(n))
     }

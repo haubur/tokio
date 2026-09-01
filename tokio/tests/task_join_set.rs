@@ -10,7 +10,7 @@
     )
 ))]
 
-use futures::future::{pending, FutureExt};
+use futures::future::{FutureExt, pending};
 use std::panic;
 use tokio::sync::oneshot;
 use tokio::task::{JoinSet, LocalSet};
@@ -216,11 +216,12 @@ fn runtime_gone() {
         drop(rt);
     }
 
-    assert!(rt()
-        .block_on(set.join_next())
-        .unwrap()
-        .unwrap_err()
-        .is_cancelled());
+    assert!(
+        rt().block_on(set.join_next())
+            .unwrap()
+            .unwrap_err()
+            .is_cancelled()
+    );
 }
 
 #[tokio::test]
@@ -298,7 +299,7 @@ async fn abort_all() {
 #[tokio::test(flavor = "current_thread")]
 async fn join_set_coop() {
     // Large enough to trigger coop.
-    const TASK_NUM: u32 = 1000;
+    const TASK_NUM: usize = 1000;
 
     static SEM: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(0);
 

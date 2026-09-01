@@ -15,7 +15,7 @@ fn semaphore_poll(
 
 fn semaphore_poll_many(
     sem: &mut PollSemaphore,
-    permits: u32,
+    permits: usize,
 ) -> tokio_test::task::Spawn<impl Future<Output = SemRet> + '_> {
     let fut = std::future::poll_fn(move |cx| sem.poll_acquire_many(cx, permits));
     tokio_test::task::spawn(fut)

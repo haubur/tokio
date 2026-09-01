@@ -2,7 +2,7 @@ use futures_core::Stream;
 use std::fmt;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::task::{ready, Context, Poll};
+use std::task::{Context, Poll, ready};
 use tokio::sync::{AcquireError, OwnedSemaphorePermit, Semaphore, TryAcquireError};
 
 use super::ReusableBoxFuture;
@@ -13,7 +13,7 @@ use super::ReusableBoxFuture;
 pub struct PollSemaphore {
     semaphore: Arc<Semaphore>,
     permit_fut: Option<(
-        u32, // The number of permits requested.
+        usize, // The number of permits requested.
         ReusableBoxFuture<'static, Result<OwnedSemaphorePermit, AcquireError>>,
     )>,
 }
@@ -75,7 +75,7 @@ impl PollSemaphore {
     pub fn poll_acquire_many(
         &mut self,
         cx: &mut Context<'_>,
-        permits: u32,
+        permits: usize,
     ) -> Poll<Option<OwnedSemaphorePermit>> {
         let permit_future = match self.permit_fut.as_mut() {
             Some((prev_permits, fut)) if *prev_permits == permits => fut,
