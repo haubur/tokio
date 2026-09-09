@@ -295,6 +295,11 @@ impl Semaphore {
     }
 
     pub(crate) fn acquire(&self, num_permits: usize) -> Acquire<'_> {
+        assert!(
+            num_permits <= Self::MAX_PERMITS,
+            "a semaphore may not have more than MAX_PERMITS permits ({})",
+            Self::MAX_PERMITS
+        );
         Acquire::new(self, num_permits)
     }
 

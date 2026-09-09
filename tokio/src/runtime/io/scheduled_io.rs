@@ -1,11 +1,11 @@
 use crate::io::interest::Interest;
 use crate::io::ready::Ready;
-use crate::loom::sync::atomic::AtomicUsize;
 use crate::loom::sync::Mutex;
+use crate::loom::sync::atomic::AtomicUsize;
 use crate::runtime::io::{Direction, ReadyEvent, Tick};
+use crate::util::WakeList;
 use crate::util::bit;
 use crate::util::linked_list::{self, LinkedList};
-use crate::util::WakeList;
 
 use std::cell::UnsafeCell;
 use std::future::Future;

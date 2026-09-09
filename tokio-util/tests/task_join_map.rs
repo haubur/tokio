@@ -3,7 +3,7 @@
 
 use std::panic::AssertUnwindSafe;
 
-use futures::future::{FutureExt, pending};
+use futures::future::{pending, FutureExt};
 use tokio::sync::oneshot;
 use tokio::task::LocalSet;
 use tokio::time::Duration;
@@ -435,14 +435,14 @@ async fn try_join_next_advances_through_multiple() {
     // runtime this means they have actually finished.
     let _ = SEM.acquire_many(N).await.unwrap();
 
-    let mut seen = vec![false; N as usize];
+    let mut seen = vec![false; N];
     let mut count = 0;
     loop {
         match map.try_join_next() {
             Some((key, res)) => {
                 let v = res.expect("task should have completed successfully");
                 assert_eq!(key, v);
-                seen[v as usize] = true;
+                seen[v] = true;
                 count += 1;
             }
             None if map.is_empty() => break,
