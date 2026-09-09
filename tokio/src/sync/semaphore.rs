@@ -674,7 +674,7 @@ impl Semaphore {
 
         Ok(SemaphorePermit {
             sem: self,
-            permits: n as usize,
+            permits: n,
         })
     }
 
@@ -745,7 +745,7 @@ impl Semaphore {
         match self.ll_sem.try_acquire(n) {
             Ok(()) => Ok(SemaphorePermit {
                 sem: self,
-                permits: n as usize,
+                permits: n,
             }),
             Err(e) => Err(e),
         }
@@ -960,7 +960,7 @@ impl Semaphore {
         inner.await?;
         Ok(OwnedSemaphorePermit {
             sem: self,
-            permits: n as usize,
+            permits: n,
         })
     }
 
@@ -1042,7 +1042,7 @@ impl Semaphore {
         match self.ll_sem.try_acquire(n) {
             Ok(()) => Ok(OwnedSemaphorePermit {
                 sem: self,
-                permits: n as usize,
+                permits: n,
             }),
             Err(e) => Err(e),
         }
